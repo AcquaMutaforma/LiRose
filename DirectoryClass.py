@@ -11,6 +11,7 @@ class Directory:
         self.path = path
         self.lastUpdate = lastUpdate
         self.stato = stato
+        # todo: metodo verifica informazioni
 
     def toDict(self) -> dict:
         return {
@@ -18,3 +19,6 @@ class Directory:
             'path': self.path,
             'lastUpdate': self.lastUpdate
         }
+
+    def getPath(self):
+        return self.path

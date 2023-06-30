@@ -1,11 +1,18 @@
 from LogManager import logger as log
 import json
 import Nodo
+import os
+import subprocess  # per creare files invisibili in windows :<
+
+cartella = 'configFile/'
+confNodo = cartella + 'nodo.conf'
+confDir = '/dir.conf'
+confFile = '/file.conf'
 
 
 def getNodo() -> Nodo.Nodo | None:
     try:
-        f = open('configFile/nodo.conf', 'r')
+        f = open(confNodo, 'r')
         tmp = json.load(f)
         if isinstance(tmp, list):
             log.error("File config Nodo e' una lista e non un dict! -" + str(type(tmp)))
@@ -21,7 +28,34 @@ def getNodo() -> Nodo.Nodo | None:
         log.warning(f'Errore apertura file config nodo - {e}')
 
 
-def leggiConfigDirFiles(dirpath) -> list:
+def leggiConfigFile(dirpath: str) -> list | None:
     """Una volta letto il file, tramite JSON ritorno una lista di dict"""
-    return []
+    try:
+        f = open(dirpath + confFile, 'r')
+        return json.load(f)
+    except PermissionError as e:
+        log.error(f"Impossibile aprire il file config - permesso negato - {e}")
+        return None
+    except FileNotFoundError:
+        return []
 
+
+# todo: questo puo essere chiamato fuori o e' troppo rischioso?
+def __scriviFileConfig(filename: str, dati: str) -> bool:
+    try:
+        fp = open(filename, 'w')
+        fp.write(dati)
+        return True
+    except PermissionError as e:
+        log.error(f"Errore scrittura config '{filename}' - Permessi - {e}")
+    except Exception as e:
+        log.error(f"Errore scrittura config '{filename}' - {e}")
+    # Se e' windows, cerco di nascondere i file config aggiungendo l'attributo "hidden"
+    # Per ora se uso Linux li vedo, quelli skillati possono fare quello che vogliono u.u
+    if os.name == 'nt':
+        try:
+            subprocess.check_call(["attrib", "+H", filename])
+            return True
+        except Exception as e:
+            log.warning(f"Occultamento file config {filename} fallito - {e}")
+    return True

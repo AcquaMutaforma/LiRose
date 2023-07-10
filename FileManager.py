@@ -1,18 +1,20 @@
+import LogManager
 from LogManager import logger as log
 import ConfigManager
 import datetime
 import os
 import hashlib
-import time
 
-dateFormat = "%d/%m/%Y %H:%M"
+
+dateFormat = "%d/%m/%Y %H:%M:%S"
+LogManager.setName(__name__)
 
 
 def verificaCorrettezzaFileInConfig(y, dirpath: str) -> bool:
     """L'oggetto File viene messo a confronto con il file nella cartella, se sono differenti ritorno False."""
     filename = y.getFilename()
     percorsoCompleto = dirpath + '/' + filename
-    datafile = datetime.datetime.strptime(time.ctime(os.path.getmtime(percorsoCompleto)), dateFormat)
+    datafile = datetime.datetime.fromtimestamp(os.path.getmtime(percorsoCompleto))
     if datafile != y.getLastUpdate():
         log.debug(f"File e config non hanno data uguale: {filename} conf:{y.getLastUpdate()} file: {datafile}")
         return False
@@ -92,7 +94,7 @@ class File:
         return {
             'filename': self.getFilename(),
             'hashCode': self.getHashcode(),
-            'lastUpdate': self.getLastUpdate().__str__()
+            'lastUpdate': self.getLastUpdate().strftime(dateFormat)
         }
 
     def getFilename(self):
@@ -101,7 +103,7 @@ class File:
     def getHashcode(self):
         return self.__hashCode
 
-    def getLastUpdate(self) -> datetime.date:
+    def getLastUpdate(self) -> datetime.datetime:
         return self.__lastUpdate
 
 
@@ -111,15 +113,20 @@ class File:
 
 def creaNuovoFileObj(filename: str, dirpath: str) -> File | None:
     """Prende dal file le info, calcola l'hash, crea un oggetto 'File' e lo ritorna"""
+    log.debug(f"Creazione File Object per {filename} da {dirpath}")
     percorsoCompleto = dirpath + '/' + filename
     try:
-        datafile = time.ctime(os.path.getmtime(percorsoCompleto))
+        datafile = datetime.datetime.fromtimestamp(os.path.getmtime(percorsoCompleto))
+        log.debug(f"Data file {datafile}")
         nuovoHash = __calcolaHashCode(percorsoCompleto)
+        log.debug(f"Hash del file {nuovoHash}")
         if nuovoHash is None:
             return None
-        return File(filename=filename, hashCode=nuovoHash, lastUpdate=datafile)
+        f = File(filename=filename, hashCode=nuovoHash, lastUpdate=datafile.strftime(dateFormat))
+        log.debug(f"{f.toDict()}")
+        return f
     except FileNotFoundError as e:
-        log.error(f"File:{filename} in Cartella:{dirpath} non trovato {e} - WTF")
+        log.error(f"{__name__} - File:{filename} in Cartella:{dirpath} non trovato {e} - WTF")
         return None
 
 

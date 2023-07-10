@@ -2,3 +2,6 @@
 appunti.txt
 
 *.pyc
+
+*.log
+*.txt

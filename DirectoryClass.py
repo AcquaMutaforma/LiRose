@@ -2,15 +2,13 @@
 Classe per gestire gli oggetti directory e relative funzioni.
 Le info che questa classe contiene servono al main per gestire le varie directory
 """
-from Status import Stato
 
 
 class Directory:
-    def __init__(self, nome: str, path: str, lastUpdate: str = None, stato: Stato = None):
+    def __init__(self, nome: str, path: str, lastUpdate: str = None):
         self.nome = nome
         self.path = path
         self.lastUpdate = lastUpdate
-        self.stato = stato
         # todo: metodo verifica informazioni
 
     def toDict(self) -> dict:

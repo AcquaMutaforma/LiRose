@@ -7,7 +7,9 @@ import subprocess  # per creare files invisibili in windows :<
 cartella = 'configFile/'
 confNodo = cartella + 'nodo.conf'
 confDir = '/dir.conf'
-confFile = '/file.conf'
+confFile = '/files.conf'
+# NOTAA: il file configurazione viene usato per fare il confronto con altri nodi, non gli frega se in locale hai
+# fatto delle modifiche o meno
 
 
 def getNodo() -> Nodo.Nodo | None:
@@ -42,6 +44,7 @@ def leggiConfigFile(dirpath: str) -> list | None:
 
 # todo: questo puo essere chiamato fuori o e' troppo rischioso?
 def __scriviFileConfig(filename: str, dati: str) -> bool:
+    json.dump()  # TODO: cambiare dati: str -> dict, cosi uso json per scrivere direttamente sul file, da fixare
     try:
         fp = open(filename, 'w')
         fp.write(dati)

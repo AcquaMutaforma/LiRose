@@ -5,3 +5,5 @@ appunti.txt
 
 *.log
 *.txt
+/tests/tmp
+*.conf

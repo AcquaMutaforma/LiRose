@@ -2,46 +2,46 @@ import FileManager
 import os
 import unittest
 import json
+import ConfigManager
 
 
 percorsoCompleto = str(__file__).replace('testFileManager.py', '')
 
 
-"""def correggi_path(aaa: str) -> str:
-    if os.name == 'nt':
-        return aaa.replace('/', '\\')
-    else:
-        return aaa"""
-
-
 class MyTestCase(unittest.TestCase):
-    def test_nuovoFileObj(self):
+    def test_nuovoElementoFile(self):
         filename = 'tmp/test1.txt'
         fp = open(filename, 'w')
         fp.write('ciaone test 123 prova prova sa sa')
         fp.close()
-        fileobj = FileManager.creaNuovoFileObj(filename=filename, dirpath=percorsoCompleto)
+        fileobj = FileManager.creaElementoFile(filename=filename, dirpath=percorsoCompleto)
+        print(f"Elemento File creato = {fileobj.toDict()}")
         self.assertIsNotNone(fileobj)
-        self.assertTrue(FileManager.verificaCorrettezzaFileInConfig(y=fileobj, dirpath=percorsoCompleto))
         self.assertEqual(filename, fileobj.getFilename())
-        #os.remove(filename)
+        os.remove(filename)
+        print(f"File {filename} eliminato")
 
-    def test_loadfiles(self):
+    def test_nuovoElementoDir(self):
+        nomeDir = '/aaa'
+        percorsoDir = percorsoCompleto + nomeDir
+        os.mkdir(percorsoDir)
+        aaa = FileManager.creaElementoDir(dirname=nomeDir)
+        self.assertIsNotNone(aaa)
+        self.assertEqual([], aaa.toDict().get('contenuto'))
+        os.rmdir(percorsoDir)
+
+    def test_configurazione(self):
         filename = 'tmp/test2.txt'
         fp = open(filename, 'w')
         fp.write('ciaone test 123 prova prova sa sa')
         fp.close()
-        fileobj = FileManager.creaNuovoFileObj(filename=filename, dirpath=percorsoCompleto)
-        configFile = 'tmp/file.conf'
+        configFile = ConfigManager.confFile
+        configurazione = FileManager.getConfigurazione(percorsoCompleto + '/tmp/')
         conffile = open(configFile, 'w')
-        conffile.write(json.dumps(fileobj.toDict()))
+        conffile.write(json.dumps(configurazione))
         conffile.close()
-        lista = FileManager.loadFiles(percorsoCompleto)
-        '''print(f"lista ==" +str(lista))
-        self.assertEqual(0, lista[1])
-        self.assertEqual(0, lista[2])
-        self.assertEqual(0, lista[3])
-        #os.remove(filename)'''
+        os.remove(filename)
+
 
 if __name__ == '__main__':
     unittest.main()

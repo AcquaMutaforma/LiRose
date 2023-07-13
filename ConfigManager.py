@@ -5,9 +5,9 @@ import os
 import subprocess  # per creare files invisibili in windows :<
 
 cartella = 'configFile/'
-confNodo = cartella + 'nodo.conf'
-confDir = 'dir.conf'
-confFile = 'files.conf'
+confNodo = cartella + 'nodo_Config.conf'
+confDir = 'dir_Config.conf'
+confFile = 'file_Config.conf'
 # NOTAA: il file configurazione viene usato per fare il confronto con altri nodi, non gli frega se in locale hai
 # fatto delle modifiche o meno
 

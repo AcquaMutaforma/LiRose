@@ -68,9 +68,9 @@ class Dir(Elemento):
         return self.__dirname
 
     def toDict(self) -> dict:
-        cont = {}
+        cont = []
         for x in self.__contenuto:
-            cont.update(x.toDict())
+            cont.append(x.toDict())
         return {
             'dirname': self.getDirname(),
             'contenuto': cont  # todo: controllare se ha senso
@@ -107,7 +107,7 @@ def creaLista(dirpath: str) -> list[Elemento]:
                     toret.append(f)
                     log.debug(f"Aggiunto File(Elemento): {f.toDict()} alla lista ")
             elif i.is_dir():
-                tmp = creaElementoDir(nomeOggetto, dirpath)
+                tmp = creaElementoDir(nomeOggetto)
                 if tmp is None:
                     log.error(f"DIR {nomeOggetto} in {dirpath} e' None ?!")
                     continue
@@ -151,21 +151,20 @@ def creaElementoFile(filename: str, dirpath: str) -> File | None:
         if nuovoHash is None:
             return None
         f = File(filename=filename, hashCode=nuovoHash, lastUpdate=datafile.strftime(dateFormat))
-        log.debug(f"{f.toDict()}")
         return f
     except FileNotFoundError as e:
         log.error(f"{__name__} - File:{filename} in Cartella:{dirpath} non trovato {e} - WTF")
         return None
 
 
-def creaElementoDir(dirname: str, dirpath: str) -> Dir | None:
-    log.debug(f"Creazione Dir Object per {dirname} da {dirpath}")
+def creaElementoDir(dirname: str) -> Dir | None:
+    log.debug(f"Creazione Dir Object per {dirname} ")
     try:
         d = Dir(dirname=dirname)
         log.debug(f"{d.toDict()}")
         return d
     except FileNotFoundError as e:
-        log.error(f"{__name__} - Dir:{dirname} in Cartella:{dirpath} non trovato {e} - WTF")
+        log.error(f"{__name__} - Dir:{dirname} non trovato {e} - WTF")
         return None
 
 

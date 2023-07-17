@@ -2,7 +2,6 @@
 Classe Nodo mantiene tutte le info principali del dispositivo
 """
 import DirectoryManager
-import DirectoryClass
 
 
 class Nodo:
@@ -18,7 +17,7 @@ class Nodo:
     def toDict(self) -> dict:
         dirList = []
         for x in self.directoryList:
-            if isinstance(x, DirectoryClass.Directory):
+            if isinstance(x, DirectoryManager.Directory):
                 dirList.append(x.getPath())
         return {
             'nome': self.nome,

@@ -1,6 +1,3 @@
 # Ara ara
 
-"""
-Note varie
 
-"""

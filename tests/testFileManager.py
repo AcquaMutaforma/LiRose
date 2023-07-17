@@ -1,4 +1,4 @@
-import FileManager
+import DirFilesManager
 import os
 import unittest
 import json
@@ -14,7 +14,7 @@ class MyTestCase(unittest.TestCase):
         fp = open(filename, 'w')
         fp.write('ciaone test 123 prova prova sa sa')
         fp.close()
-        fileobj = FileManager.creaElementoFile(filename=filename, dirpath=percorsoCompleto)
+        fileobj = FileManager.__creaElementoFile(filename=filename, dirpath=percorsoCompleto)
         print(f"Elemento File creato = {fileobj.toDict()}")
         self.assertIsNotNone(fileobj)
         self.assertEqual(filename, fileobj.getFilename())
@@ -24,8 +24,12 @@ class MyTestCase(unittest.TestCase):
     def test_nuovoElementoDir(self):
         nomeDir = '/aaa'
         percorsoDir = percorsoCompleto + nomeDir
+        try:
+            os.rmdir(percorsoDir)
+        except FileNotFoundError:
+            pass
         os.mkdir(percorsoDir)
-        aaa = FileManager.creaElementoDir(dirname=nomeDir)
+        aaa = FileManager.__creaElementoDir(dirname=nomeDir)
         self.assertIsNotNone(aaa)
         self.assertEqual([], aaa.toDict().get('contenuto'))
         os.rmdir(percorsoDir)

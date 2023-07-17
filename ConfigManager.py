@@ -1,8 +1,10 @@
-from LogManager import logger as log
+import LogManager
 import json
 import Nodo
 import os
 import subprocess  # per creare files invisibili in windows :<
+
+log = LogManager.setName(__name__)
 
 cartella = 'configFile/'
 confNodo = cartella + 'nodo_Config.conf'
@@ -17,6 +19,7 @@ def getNodo() -> Nodo.Nodo | None:
         f = open(confNodo, 'r')
         tmp = json.load(f)
         if isinstance(tmp, list):
+            # TODO: errore, se tmp e' una list allora devo fare un FOR X IN LIST
             log.error("File config Nodo e' una lista e non un dict! -" + str(type(tmp)))
         # todo: verifica validità dell'oggetto json prima di andare a prendere queste info
         a = Nodo.Nodo(nome=tmp.nome, idn=tmp.idNodo, sbpath=tmp.safeBinPath, dirlist=tmp.dirList,

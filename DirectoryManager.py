@@ -56,7 +56,7 @@ def creaDir(nome: str, path: str) -> Directory | None:
         return None
     if verificaEsistenzaDir(path):
         tmp = Directory(nome=nome, path=path)
-        log.debug(f"Creato oggetto Dir: {tmp.toDict()}")
+        log.debug(f"Creato oggetto Dir: [{tmp.toDict()}]")
         return tmp
     else:
         return None
@@ -67,31 +67,38 @@ def creaRidondanza(nome: str, path: str, parent: str) -> Directory | None:
         return None
     if verificaEsistenzaDir(path):
         tmp = Ridondanza(nome=nome, path=path, parentPath=parent)
-        log.debug(f"Creato oggetto Ridondanza: {tmp.toDict()}")
+        log.debug(f"Creato oggetto Ridondanza: [{tmp.toDict()}]")
         return tmp
     else:
         return None
 
 
-def loadDirList(listaDir: dict) -> list[Directory]:
+def loadDirList(listaDir: list[dict]) -> list[Directory]:
+    """Metodo che crea una lista di oggetti Dir attraverso i dati della configurazione"""
     if len(listaDir) < 1:
         return []
     toRet: list[Directory] = []
     for x in listaDir:
         if x is None:
             continue
-        if x.parent is None:
-            tmp = creaDir(nome=x.nome, path=x.path)
-            if tmp is not None:
-                toRet.append(tmp)
+        if x.get('parent') is None:
+            tmp = creaDir(nome=x.get('nome'), path=x.get('path'))
+            if tmp is None:
+                continue
+            toRet.append(tmp)
         else:
-            tmp = creaRidondanza(nome=x.nome, path=x.path, parent=x.parent)
-            if tmp is not None:
-                toRet.append(tmp)
+            tmp = creaRidondanza(nome=x.get('nome'), path=x.get('path'), parent=x.get('parent'))
+            if tmp is None:
+                continue
+            toRet.append(tmp)
+    return toRet
 
 
 def verificaEsistenzaDir(percorso: str) -> bool:
-    return os.path.isdir(percorso)
+    esito = os.path.isdir(percorso)
+    if not esito:
+        log.debug(f"La Cartella [{percorso}] non e' piu' presente o non si hanno i permessi necessari")
+    return esito
 
 
 # todo: delete ??

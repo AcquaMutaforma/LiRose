@@ -31,29 +31,34 @@ class File(Elemento):
     Lo scopo principale è fornire supporto per scrittura, lettura, valutazioni di sostituzione e verifica di
     cambiamenti nei files all'interno della cartella."""
 
-    def __init__(self, filename: str, hashCode: str, lastUpdate: str):
+    def __init__(self, filename: str, hashCode: str, lastUpdate: str, filesize: int):
         """Non controllo i valori, li faccio controllare alle 2 funzioni sopra che si occupano di caricare e creare"""
         self.__filename = filename
         self.__hashCode = hashCode
         self.__lastUpdate = datetime.datetime.strptime(lastUpdate, dateFormat)
-        log.debug(f"Creato oggetto 'File' : {self.getFilename()}, {self.getHashcode()}, {self.getLastUpdate()}")
-        # todo: aggiungo un campo per la grandezza del file?
+        self.__size = filesize
+        log.debug(f"Creato oggetto 'File' : {self.getFilename()}, {self.getHashcode()},"
+                  f"{self.getLastUpdate()}, {self.__size}")
 
     def toDict(self) -> dict:
         return {
             'filename': self.getFilename(),
             'hashCode': self.getHashcode(),
-            'lastUpdate': self.getLastUpdate()
+            'lastUpdate': self.getLastUpdate(),
+            'size': self.getSize()
         }
 
-    def getFilename(self):
+    def getFilename(self) -> str:
         return self.__filename
 
-    def getHashcode(self):
+    def getHashcode(self) -> str:
         return self.__hashCode
 
     def getLastUpdate(self) -> str:
         return self.__lastUpdate.strftime(dateFormat)
+
+    def getSize(self) -> int:
+        return self.__size
 
 
 class Dir(Elemento):
@@ -69,16 +74,16 @@ class Dir(Elemento):
         return self.__dirname
 
     def toDict(self) -> dict:
-        cont = []
+        cont: list[dict] = []
         for x in self.__contenuto:
             cont.append(x.toDict())
         return {
             'dirname': self.getDirname(),
-            'contenuto': cont  # todo: controllare se ha senso
+            'contenuto': cont
         }
 
 
-def getConfigurazione(dirpath: str) -> list[dict]:
+def getConfigString(dirpath: str) -> list[dict]:
     """
     Chiama il metodo per creare la List <Elemento> poi in ricorsione trasforma tutto in formato dict per essere
     scritto da Json nel file configurazione
@@ -91,10 +96,8 @@ def getConfigurazione(dirpath: str) -> list[dict]:
 
 
 def getListaElementiLocali(dirpath: str) -> list[Elemento]:
-    """
-    Metodo per creare una lista di oggetti in base ai files e cartelle presenti nel percorso specificato.
-    Smonta il JSON e in maniera ricorsiva(nelle dir) va a creare i vari oggetti
-    """
+    """Metodo per creare una lista di oggetti in base ai files e cartelle presenti nel percorso specificato.
+    In maniera ricorsiva(nelle dir) va a creare i vari oggetti Elemento"""
     toret: list[Elemento] = []
     listaFilesPresenti = os.scandir(dirpath)
     for i in listaFilesPresenti:
@@ -103,12 +106,12 @@ def getListaElementiLocali(dirpath: str) -> list[Elemento]:
             if ConfigManager.confFile in nomeOggetto:
                 continue
             if i.is_file():
-                f = __creaElementoFile(nomeOggetto, dirpath)
+                f = creaElementoFile(nomeOggetto, dirpath)
                 if f is not None:
                     toret.append(f)
-                    log.debug(f"Aggiunto File(Elemento): {f.toDict()} alla lista ")
+                    log.debug(f"Aggiunto File(Elemento): [{f.toDict()}] alla lista ")
             elif i.is_dir():
-                tmp = __creaElementoDir(nomeOggetto)
+                tmp = creaElementoDir(nomeOggetto)
                 if tmp is None:
                     log.error(f"DIR {nomeOggetto} in {dirpath} e' None ?!")
                     continue
@@ -117,35 +120,39 @@ def getListaElementiLocali(dirpath: str) -> list[Elemento]:
                     for j in contenutoTmp:
                         tmp.aggiungiElemento(j)
                     toret.append(tmp)
-                    log.debug(f"Aggiunto Dir(Elemento): {tmp.getDirname()} con {len(contenutoTmp)} elementi alla lista")
+                    log.debug(f"Aggiunto Dir(Elemento): [{tmp.getDirname()}] con [{len(contenutoTmp)}] elementi alla lista")
                 except Exception as e:
                     log.error(f'Errore creazione elemento DIR - {tmp.toDict()} - {e}')
         except PermissionError as e:
-            log.error(f"Accesso ad un file in {dirpath} negato - {e}")
+            log.error(f"Accesso ad un file in [{dirpath}] negato - {e}")
     return toret
 
 
-def getListaElementiFromConf(configurazione: list[dict]) -> list[Elemento]: # TODO: Controllare se sia corretto e aggiungi i log
+def creaListaElementiFromConf(configurazione: list[dict]) -> list[Elemento]:
     if len(configurazione) < 1:
+        log.warning("Lunghezza della config fornita e' '<1'")
         return []
     toret: list[Elemento] = []
     for x in configurazione:
-        if x.get('dirname') is not None:
-            a = File(filename=x.get('filename'), hashCode=x.get('hashCode'), lastUpdate=x.get('lastUpdate'))
+        if x.get('dirname') is None:
+            a = File(filename=x.get('filename'), hashCode=x.get('hashCode'),
+                     lastUpdate=x.get('lastUpdate'), filesize=x.get('size'))
             if a is not None:
                 toret.append(a)
         else:
             b = Dir(dirname=x.get('dirname'))
             if b is None:
+                log.warning(f"Nella configurazione [x.dirname] != da None --> dovrebbe essere una cartella "
+                            f"--> creazione fallita con valore [{x}]")
                 continue
-            listaContenuto = (getListaElementiFromConf(x.get('contenuto')))
+            listaContenuto = (creaListaElementiFromConf(x.get('contenuto')))
             for y in listaContenuto:
                 b.aggiungiElemento(y)
             toret.append(b)
     return toret
 
 
-def __creaElementoFile(filename: str, dirpath: str) -> File | None:
+def creaElementoFile(filename: str, dirpath: str) -> File | None:
     """Prende dal file le info, calcola l'hash, crea un oggetto 'File' e lo ritorna"""
     log.debug(f"Creazione File Object per {filename} da {dirpath}")
     percorsoCompleto = dirpath + '/' + filename
@@ -154,23 +161,26 @@ def __creaElementoFile(filename: str, dirpath: str) -> File | None:
         log.debug(f"Data file {datafile}")
         nuovoHash = __calcolaHashCode(percorsoCompleto)
         log.debug(f"Hash del file {nuovoHash}")
+        size = os.path.getsize(percorsoCompleto)
+        log.debug(f"grandezza file {size}")
         if nuovoHash is None:
             return None
-        f = File(filename=filename, hashCode=nuovoHash, lastUpdate=datafile.strftime(dateFormat))
+        f = File(filename=filename, hashCode=nuovoHash, lastUpdate=datafile.strftime(dateFormat), filesize=size)
         return f
     except FileNotFoundError as e:
-        log.error(f"{__name__} - File:{filename} in Cartella:{dirpath} non trovato {e} - WTF")
+        log.error(f"File:[{filename}] in Cartella:[{dirpath}] non trovato {e} - WTF")
         return None
 
 
-def __creaElementoDir(dirname: str) -> Dir | None:
-    log.debug(f"Creazione Dir Object per {dirname} ")
-    try:
+def creaElementoDir(dirname: str, dirpath: str) -> Dir | None:
+    log.debug(f"Creazione Dir Object per {dirname} nella cartella {dirpath}")
+    percorsoCompleto = dirpath + '/' + dirname
+    if os.path.isdir(percorsoCompleto):
         d = Dir(dirname=dirname)
         log.debug(f"{d.toDict()}")
         return d
-    except FileNotFoundError as e:
-        log.error(f"{__name__} - Dir:{dirname} non trovato {e} - WTF")
+    else:
+        log.error(f"Dir: [{dirname}] in Cartella: [{dirpath}] non trovato - WTF")
         return None
 
 

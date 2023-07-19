@@ -14,7 +14,7 @@ class MyTestCase(unittest.TestCase):
         fp = open(filename, 'w')
         fp.write('ciaone test 123 prova prova sa sa')
         fp.close()
-        fileobj = FileManager.__creaElementoFile(filename=filename, dirpath=percorsoCompleto)
+        fileobj = FileManager.creaElementoFile(filename=filename, dirpath=percorsoCompleto)
         print(f"Elemento File creato = {fileobj.toDict()}")
         self.assertIsNotNone(fileobj)
         self.assertEqual(filename, fileobj.getFilename())
@@ -29,7 +29,7 @@ class MyTestCase(unittest.TestCase):
         except FileNotFoundError:
             pass
         os.mkdir(percorsoDir)
-        aaa = FileManager.__creaElementoDir(dirname=nomeDir)
+        aaa = FileManager.creaElementoDir(dirname=nomeDir)
         self.assertIsNotNone(aaa)
         self.assertEqual([], aaa.toDict().get('contenuto'))
         os.rmdir(percorsoDir)
@@ -40,7 +40,7 @@ class MyTestCase(unittest.TestCase):
         fp.write('ciaone test 123 prova prova sa sa')
         fp.close()
         configFile = ConfigManager.confFile
-        configurazione = FileManager.getConfigurazione(percorsoCompleto + '/tmp/')
+        configurazione = FileManager.getConfigString(percorsoCompleto + '/tmp/')
         conffile = open(configFile, 'w')
         conffile.write(json.dumps(configurazione))
         conffile.close()

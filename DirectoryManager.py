@@ -54,26 +54,20 @@ class Ridondanza(Directory):
 def creaDir(nome: str, path: str) -> Directory | None:
     if nome is None or path is None:
         return None
-    if verificaEsistenzaDir(path):
-        tmp = Directory(nome=nome, path=path)
-        log.debug(f"Creato oggetto Dir: [{tmp.toDict()}]")
-        return tmp
-    else:
-        return None
+    tmp = Directory(nome=nome, path=path)
+    log.debug(f"Creato oggetto Dir: [{tmp.toDict()}]")
+    return tmp
 
 
 def creaRidondanza(nome: str, path: str, parent: str) -> Directory | None:
     if nome is None or path is None or parent is None:
         return None
-    if verificaEsistenzaDir(path):
-        tmp = Ridondanza(nome=nome, path=path, parentPath=parent)
-        log.debug(f"Creato oggetto Ridondanza: [{tmp.toDict()}]")
-        return tmp
-    else:
-        return None
+    tmp = Ridondanza(nome=nome, path=path, parentPath=parent)
+    log.debug(f"Creato oggetto Ridondanza: [{tmp.toDict()}]")
+    return tmp
 
 
-def loadDirList(listaDir: list[dict]) -> list[Directory]:
+def loadDirsFromConfig(listaDir: list[dict]) -> list[Directory]:
     """Metodo che crea una lista di oggetti Dir attraverso i dati della configurazione"""
     if len(listaDir) < 1:
         return []
@@ -85,26 +79,23 @@ def loadDirList(listaDir: list[dict]) -> list[Directory]:
             tmp = creaDir(nome=x.get('nome'), path=x.get('path'))
             if tmp is None:
                 continue
-            toRet.append(tmp)
+            '''if verificaEsistenzaDir(tmp.getNome(), tmp.getPath()):
+                toRet.append(tmp)'''
         else:
             tmp = creaRidondanza(nome=x.get('nome'), path=x.get('path'), parent=x.get('parent'))
             if tmp is None:
                 continue
-            toRet.append(tmp)
+            '''if verificaEsistenzaDir(tmp.getNome(), tmp.getPath()):
+                toRet.append(tmp)'''
     return toRet
 
 
-def verificaEsistenzaDir(percorso: str) -> bool:
-    esito = os.path.isdir(percorso)
+def verificaEsistenzaDir(dirname: str, percorso: str) -> bool:
+    percorsoCompleto = percorso + '/' + dirname
+    esito = os.path.isdir(percorsoCompleto)
     if not esito:
-        log.debug(f"La Cartella [{percorso}] non e' piu' presente o non si hanno i permessi necessari")
+        log.debug(f"La Cartella [{percorsoCompleto}] non e' piu' presente o non si hanno i permessi necessari")
     return esito
 
-
-# todo: delete ??
-def getDirnameFromPath(percorso: str) -> str:
-    if os.name == 'nt':
-        separatore = '\\'
-    else:
-        separatore = '/'
-    return percorso.split(sep=separatore).pop()
+# TODO: Aggiungere una funzione per "verificaEsistenzaDir" che si applica alle Dir caricate dalla configurazione.
+#  Se non le trovo che combino? ToBeDecided

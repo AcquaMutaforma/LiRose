@@ -106,12 +106,12 @@ def getListaElementiLocali(dirpath: str) -> list[Elemento]:
             if ConfigManager.confFile in nomeOggetto:
                 continue
             if i.is_file():
-                f = creaElementoFile(nomeOggetto, dirpath)
+                f = __creaElementoFile(filename=nomeOggetto, dirpath=dirpath)
                 if f is not None:
                     toret.append(f)
                     log.debug(f"Aggiunto File(Elemento): [{f.toDict()}] alla lista ")
             elif i.is_dir():
-                tmp = creaElementoDir(nomeOggetto)
+                tmp = __creaElementoDir(dirname=nomeOggetto, dirpath=dirpath)
                 if tmp is None:
                     log.error(f"DIR {nomeOggetto} in {dirpath} e' None ?!")
                     continue
@@ -152,7 +152,7 @@ def creaListaElementiFromConf(configurazione: list[dict]) -> list[Elemento]:
     return toret
 
 
-def creaElementoFile(filename: str, dirpath: str) -> File | None:
+def __creaElementoFile(filename: str, dirpath: str) -> File | None:
     """Prende dal file le info, calcola l'hash, crea un oggetto 'File' e lo ritorna"""
     log.debug(f"Creazione File Object per {filename} da {dirpath}")
     percorsoCompleto = dirpath + '/' + filename
@@ -172,7 +172,7 @@ def creaElementoFile(filename: str, dirpath: str) -> File | None:
         return None
 
 
-def creaElementoDir(dirname: str, dirpath: str) -> Dir | None:
+def __creaElementoDir(dirname: str, dirpath: str) -> Dir | None:
     log.debug(f"Creazione Dir Object per {dirname} nella cartella {dirpath}")
     percorsoCompleto = dirpath + '/' + dirname
     if os.path.isdir(percorsoCompleto):

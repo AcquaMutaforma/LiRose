@@ -11,7 +11,7 @@ class Nodo:
         self.nome = nome
         self.idNodo = idn
         self.safeBinPath = sbpath
-        self.directoryList = DirectoryManager.loadDirList(dirlist)
+        self.directoryList = DirectoryManager.loadDirsFromConfig(dirlist)
         self.nodiList = nodi
 
     def toDict(self) -> dict:
@@ -30,3 +30,11 @@ class Nodo:
     def isValid(self):
         """ True = oggetto valido, False instead"""
         pass
+
+
+class NodoAmico:
+    def __init__(self, nome: str, idn: int):
+        self.nome = nome
+        self.idNodo = idn
+        self.lastIP = None  # Not calculated yet
+

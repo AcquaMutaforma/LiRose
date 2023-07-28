@@ -1,67 +1,54 @@
 import LogManager
 import json
-import Nodo
-import os
-import subprocess  # per creare files invisibili in windows :<
+import FileManager
 
 log = LogManager.setName(__name__)
 
-cartella = 'configFile/'
-confNodo = cartella + 'nodo_Config.conf'
-confDir = 'dir_Config.conf'
-confFile = 'file_Config.conf'
+cartella = str(__file__).replace('ConfigManager.py', 'configFiles')
+confNodo = '/nodo_Config.conf'
+confDir = '/dir_Config.conf'
+confFile = '/file_Config.conf'
 # NOTAA: il file configurazione viene usato per fare il confronto con altri nodi, non gli frega se in locale hai
 # fatto delle modifiche o meno
 
 
-def getNodo() -> Nodo.Nodo | None:
-    try:
-        f = open(confNodo, 'r')
-        tmp = json.load(f)
-        if isinstance(tmp, list):
-            # TODO: errore, se tmp e' una list allora devo fare un FOR X IN LIST
-            log.error("File config Nodo e' una lista e non un dict! -" + str(type(tmp)))
-        # todo: verifica validità dell'oggetto json prima di andare a prendere queste info
-        a = Nodo.Nodo(nome=tmp.nome, idn=tmp.idNodo, sbpath=tmp.safeBinPath, dirlist=tmp.dirList,
-                         nodi=tmp.nodiList)
-        if a.isValid() is False:
-            log.error("Errore caricamento Nodo da file config - invalid obj")
-            return None
-        # todo: verifica che l'oggetto venga creato bene prima di ritornare, altrimenti do un errore o None o altro
-        return a
-    except Exception as e:
-        log.warning(f'Errore apertura file config nodo - {e}')
-
-
-def leggiConfigFile(dirpath: str) -> list | None:
+def leggiConfigFile(dirpath: str) -> list[dict] | None:
     """Una volta letto il file, tramite JSON ritorno una lista di dict"""
-    try:
-        f = open(dirpath + confFile, 'r')
-        return json.load(f)
-    except PermissionError as e:
-        log.error(f"Impossibile aprire il file config - permesso negato - {e}")
+    percorso = dirpath + confFile
+    toret = FileManager.leggiConfig(percorsoCompleto=percorso)
+    if toret is not None:
+        return json.loads(toret)
+    else:
         return None
-    except FileNotFoundError:
-        return []
 
 
-# todo: questo puo essere chiamato fuori o e' troppo rischioso?
-def __scriviFileConfig(filename: str, dati: str) -> bool:
-    json.dump()  # TODO: cambiare dati: str -> dict, cosi uso json per scrivere direttamente sul file, da fixare
-    try:
-        fp = open(filename, 'w')
-        fp.write(dati)
-        return True
-    except PermissionError as e:
-        log.error(f"Errore scrittura config '{filename}' - Permessi - {e}")
-    except Exception as e:
-        log.error(f"Errore scrittura config '{filename}' - {e}")
-    # Se e' windows, cerco di nascondere i file config aggiungendo l'attributo "hidden"
-    # Per ora se uso Linux li vedo, quelli skillati possono fare quello che vogliono u.u
-    if os.name == 'nt':
-        try:
-            subprocess.check_call(["attrib", "+H", filename])
-            return True
-        except Exception as e:
-            log.warning(f"Occultamento file config {filename} fallito - {e}")
-    return True
+def leggiConfigDirs() -> list[dict] | None:
+    """Una volta letto il file, tramite JSON ritorno una lista di dict"""
+    toret = FileManager.leggiConfig(percorsoCompleto=confDir)
+    if toret is not None:
+        return json.loads(toret)
+    return None
+
+
+def leggiConfigNodo() -> dict | None:
+    """Una volta letto il file, tramite JSON ritorno una lista di dict"""
+    toret = FileManager.leggiConfig(percorsoCompleto=confNodo)
+    if toret is not None:
+        return json.loads(toret)
+    return None
+
+
+def aggiornaConfigFile(dirpath: str, contenuto: list[dict]) -> bool:
+    percorso = dirpath + "/" + confFile
+    cont = json.dumps(obj=contenuto)
+    return FileManager.scriviConfig(percorsoCompleto=percorso, contenuto=cont, hidden=True)
+
+
+def aggiornaConfigDir(contenuto: list[dict]) -> bool:
+    cont = json.dumps(obj=contenuto)
+    return FileManager.scriviConfig(percorsoCompleto=confDir, contenuto=cont)
+
+
+def aggiornaConfigNodo(contenuto: dict) -> bool:
+    cont = json.dumps(obj=contenuto)
+    return FileManager.scriviConfig(percorsoCompleto=confNodo, contenuto=cont)

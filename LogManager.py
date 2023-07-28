@@ -1,5 +1,6 @@
 import logging
 import datetime
+import FileManager
 
 
 def setName(nome: str) -> logging.Logger:
@@ -7,7 +8,7 @@ def setName(nome: str) -> logging.Logger:
 
 
 date = datetime.datetime.now().strftime('%d_%m_%y')
-logFileName = "Logs/" + date + "_LogFile.log"
+logFileName = FileManager.cartella_logs + date + "_LogFile.log"
 logging.basicConfig(filename=logFileName, encoding='utf-8',
                     format='[%(levelname)s] - %(asctime)s - %(name)s - %(message)s',
                     datefmt='%I:%M:%S %p', level=logging.DEBUG)

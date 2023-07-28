@@ -21,6 +21,7 @@ log = LogManager.setName(__name__)
 
 # le classi qui sotto prendono spunto dal design pattern "composite"
 
+
 class Elemento:
     def toDict(self) -> dict:
         return self.__dict__
@@ -73,9 +74,12 @@ class Dir(Elemento):
     def getDirname(self):
         return self.__dirname
 
+    def getContenuto(self):
+        return self.__contenuto
+
     def toDict(self) -> dict:
         cont: list[dict] = []
-        for x in self.__contenuto:
+        for x in self.getContenuto():
             cont.append(x.toDict())
         return {
             'dirname': self.getDirname(),
@@ -83,7 +87,7 @@ class Dir(Elemento):
         }
 
 
-def getConfigString(dirpath: str) -> list[dict]:
+def aggiornaConfigFile(dirpath: str) -> bool:
     """
     Chiama il metodo per creare la List <Elemento> poi in ricorsione trasforma tutto in formato dict per essere
     scritto da Json nel file configurazione
@@ -92,7 +96,7 @@ def getConfigString(dirpath: str) -> list[dict]:
     listaElementi: list[Elemento] = getListaElementiLocali(dirpath)
     for a in listaElementi:
         toret.append(a.toDict())
-    return toret
+    return ConfigManager.aggiornaConfigFile(dirpath=dirpath, contenuto=toret)
 
 
 def getListaElementiLocali(dirpath: str) -> list[Elemento]:

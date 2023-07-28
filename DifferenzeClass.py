@@ -12,6 +12,7 @@ class Diff:
         self.aggiunti: list[Elemento] = []
         self.rimossi: list[Elemento] = []
         self.differenti: list[Elemento] = []
+        self.spostati: list[Elemento] = []
 
 
 def __creaDiff(dirpath: str, fonteEsterna: str | Nodo.Nodo) -> Diff:
@@ -23,6 +24,7 @@ def confrontaConfigEsterna(dirpath: str, fonteEsterna: str | Nodo.Nodo, confEste
     if dirpath is None or fonteEsterna is None:
         return None
     toret = __creaDiff(dirpath=dirpath, fonteEsterna=fonteEsterna)
+    # NOPE! Non ricalcolare tutto, prendi la CONFIG dei file, viene rigenerata all'avvio del software
     listaLocale = DirFilesManager.getListaElementiLocali(dirpath=dirpath)
     listaEsterna = DirFilesManager.creaListaElementiFromConf(configurazione=confEsterna)
 

@@ -26,6 +26,9 @@ class Directory:
     def getNome(self):
         return self.__nome
 
+    def verificaEsistenza(self) -> bool:
+        return verificaEsistenzaDir(dirname=self.getNome(), percorso=self.getPath())
+
 
 class Ridondanza(Directory):
     def __init__(self, nome: str, path: str, parentPath: str):
@@ -46,6 +49,7 @@ class Ridondanza(Directory):
         return Directory(self.getNome(), self.getPath())
 
     def checkSincronizzazione(self) -> bool:
+        # todo
         """Penso dovrebbe usare il metodo presente in DirFilesManager che utilizza i file config per fare le differenze
         e valutare l'aggiornamento"""
         pass
@@ -65,6 +69,13 @@ def creaRidondanza(nome: str, path: str, parent: str) -> Directory | None:
     tmp = Ridondanza(nome=nome, path=path, parentPath=parent)
     log.debug(f"Creato oggetto Ridondanza: [{tmp.toDict()}]")
     return tmp
+
+
+def listaDirsToDict(listadir: list[Directory]) -> list[dict]:
+    toret: list[dict] = []
+    for x in listadir:
+        toret.append(x.toDict())
+    return toret
 
 
 def loadDirsFromConfig(listaDir: list[dict]) -> list[Directory]:
@@ -90,12 +101,10 @@ def loadDirsFromConfig(listaDir: list[dict]) -> list[Directory]:
     return toRet
 
 
+# Da chiamare quando si vanno a visualizzare/caricare le dirs
 def verificaEsistenzaDir(dirname: str, percorso: str) -> bool:
     percorsoCompleto = percorso + '/' + dirname
     esito = os.path.isdir(percorsoCompleto)
     if not esito:
-        log.debug(f"La Cartella [{percorsoCompleto}] non e' piu' presente o non si hanno i permessi necessari")
+        log.warning(f"La Cartella [{percorsoCompleto}] non e' piu' presente o non si hanno i permessi necessari")
     return esito
-
-# TODO: Aggiungere una funzione per "verificaEsistenzaDir" che si applica alle Dir caricate dalla configurazione.
-#  Se non le trovo che combino? ToBeDecided

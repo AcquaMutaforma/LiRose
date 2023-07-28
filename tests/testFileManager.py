@@ -40,7 +40,7 @@ class MyTestCase(unittest.TestCase):
         fp.write('ciaone test 123 prova prova sa sa')
         fp.close()
         configFile = ConfigManager.confFile
-        configurazione = FileManager.getConfigString(percorsoCompleto + '/tmp/')
+        configurazione = FileManager.aggiornaConfigFile(percorsoCompleto + '/tmp/')
         conffile = open(configFile, 'w')
         conffile.write(json.dumps(configurazione))
         conffile.close()

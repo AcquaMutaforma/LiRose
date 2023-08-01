@@ -1,13 +1,13 @@
 """Classe che contiene le differenze tra gli oggetti presenti in locale e la configurazione che viene comparata"""
 import DirFilesManager
 from DirFilesManager import Elemento
-import Nodo
+from NodoClass import Nodo
 
 
 class Diff:
-    def __init__(self, dirpath: str, fonteEsterna: str | Nodo.Nodo):
+    def __init__(self, dirpath: str, fonteEsterna: str | Nodo):
         self.dirLocale = dirpath
-        self.fonteEsterna: str | Nodo.Nodo = fonteEsterna  # Path o Nome nodo
+        self.fonteEsterna: str | Nodo = fonteEsterna  # Path o Nome nodo
 
         self.aggiunti: list[Elemento] = []
         self.rimossi: list[Elemento] = []
@@ -15,11 +15,11 @@ class Diff:
         self.spostati: list[Elemento] = []
 
 
-def __creaDiff(dirpath: str, fonteEsterna: str | Nodo.Nodo) -> Diff:
+def __creaDiff(dirpath: str, fonteEsterna: str | Nodo) -> Diff:
     return Diff(dirpath=dirpath, fonteEsterna=fonteEsterna)
 
 
-def confrontaConfigEsterna(dirpath: str, fonteEsterna: str | Nodo.Nodo, confEsterna: list[dict]) -> Diff | None:
+def confrontaConfigEsterna(dirpath: str, fonteEsterna: str | Nodo, confEsterna: list[dict]) -> Diff | None:
     # Ci si aspetta che la cartella in questione ESISTA, qua non controlla nulla, al massimo un try-except
     if dirpath is None or fonteEsterna is None:
         return None

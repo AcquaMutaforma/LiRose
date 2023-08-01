@@ -114,7 +114,7 @@ def verificaDir(percorso: str):
     return os.path.isdir(percorso)
 
 
-def sincronizzaFiles():
+def sincronizzaFiles() -> list:  # lista di elementi da copiare
     pass  # todo
 
 
@@ -126,4 +126,8 @@ def copiaFile(src: str, dst: str):
     for x in files:
         shutils.copy2(os.path.join(path,x), dst_dir)
     '''
+    pass
+
+
+def fileScaduto(percorso: str) -> bool:
     pass

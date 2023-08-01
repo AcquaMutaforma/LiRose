@@ -11,9 +11,15 @@ FileManager.verificaComponentiAvvio()
 # oggetti principali
 nodoLocale = NodoClass.getNodoFromConfig(ConfigManager.leggiConfigNodo())
 
+# TODO: se nodo locale non "esiste" va creato, se in qualsiasi momento qualquadra non cosa il programma si DEVE bloccare
+
 """Lista funzioni disponibili nel programma ___________________________________________________________________ """
 
 """FUNZIONI RELATIVE A OGGETTI DIR ____________________________________________________________________________ """
+
+
+def getListaDir():  # serve alla view
+    return nodoLocale.getListaDir()
 
 
 def aggiungiDirAlNodo(path: str) -> bool:
@@ -21,7 +27,7 @@ def aggiungiDirAlNodo(path: str) -> bool:
 
 
 def visualizzaDirNodo():
-    pass # todo
+    pass  # todo
 
 
 def rimuoviDirDalNodo() -> bool:
@@ -35,33 +41,53 @@ def ricercaUpdateDirSingola(dirobj: Directory) -> Diff:
     pass  # todo
 
 
-def applicaUpdate(diff: Diff) -> bool:
+def ricercaUpdateNodo() -> bool:
+    pass  # Ricorsivamente chiama ricercaUpdateDirSingola su ogni DIR del nodo
+
+
+def applicaUpdateCompleto(diff: Diff) -> bool:
     pass  # todo
 
 
-def ricercaUpdateNodo() -> bool:
-    pass  # Ricorsivamente chiama ricercaUpdateDirSingola su ogni DIR del nodo
+def frammentaUpdate():  # modalità per aggiornamento di file singoli
+    pass  # todo
+
+
+def creaRidondanza():
+    pass  # todo
+
+
+def rimuoviRidondanza():
+    pass  # todo
+
+
+def sincronizzaRidondanza():
+    pass  # todo
 
 
 """FUNZIONI RELATIVE A NODI AMICI ____________________________________________________________________________ """
 
 
-def avviaRicercaNodiAmici():
-    f"""Tramite connection manager "pinga" ogni host per cercare dei nodi. Attende qualche secondo per le risposte.
+def getListaNodiAmici():
+    return nodoLocale.getNodiAmici()
+
+
+def avviaRicercaNodiAmici() -> list[NodoClass.NodoAmico]:
+    """Tramite connection manager "pinga" ogni host per cercare dei nodi. Attende qualche secondo per le risposte.
     Ritorna una lista di nodi trovati. Dalla view sarà possibile scegliere l'oggetto nodo da inserire 
-    tramite {aggiungiNodoAmico()}."""
+    tramite 'aggiungiNodoAmico'."""
     pass  # todo
 
 
-def aggiungiNodoAmico():
+def aggiungiNodoAmico(nodo: NodoClass.NodoAmico):
     pass  # todo
 
 
-def aggiungiNodoAmicoViaIP():
+def aggiungiNodoAmicoViaIP(indirizzo: str) -> bool:
     pass  # todo
 
 
-def rimuoviNodoAmico():
+def rimuoviNodoAmico(nodo: NodoClass.NodoAmico) -> bool:
     pass  # todo
 
 

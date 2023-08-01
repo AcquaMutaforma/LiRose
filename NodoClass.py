@@ -80,6 +80,12 @@ class Nodo:
         else:
             return ConfigManager.aggiornaConfigNodo(contenuto=self.toDict())
 
+    def getNodiAmici(self):
+        return self.__nodiAmici
+
+    def getListaDir(self):
+        return self.__directoryList
+
     def modificaSafeBinPath(self, newPercorso: str) -> bool:
         return self.__safeBinPath.modificaPercorso(newPercorso)
 

@@ -1,19 +1,19 @@
 import subprocess  # per creare files invisibili in windows :<
 import LogManager
 import os
+from SafeBinManager import SafeBin
 import SafeBinManager
 
 log = LogManager.setName(__name__)
 
 cartella_configFiles = 'configFiles'
 cartella_keys = 'keys'
-cartella_logs = 'logs'
-cartella_safebin = 'safeBin'
 
 
-def verificaComponentiAvvio():
+def verificaComponentiAvvio(safebinObj: SafeBin):
     percorsoBase = str(__file__).removesuffix('FileManager.py')
-    cartelle = [cartella_configFiles, cartella_keys, cartella_logs, cartella_safebin]
+    cartelle = [cartella_configFiles, cartella_keys, LogManager.cartella_logs,
+                SafeBinManager.getDefaultSafeBinPath(), safebinObj.getPath()]
     for x in cartelle:
         if not verificaDir(percorsoBase+x):
             happy = creaCartella(percorsoBase, x)
@@ -29,7 +29,7 @@ def creaFile(percorso: str, nomefile: str, contenuto: str) -> bool:
         fp.close()
         return False
     except FileNotFoundError:
-        return __scriviSuFile(percorsoCompleto=percorso, contenuto=contenuto)
+        return scriviSuFile(percorsoCompleto=percorso, contenuto=contenuto)
 
 
 def creaCartella(percorso: str, nomedir: str) -> bool:
@@ -43,7 +43,7 @@ def creaCartella(percorso: str, nomedir: str) -> bool:
     return False
 
 
-def __scriviSuFile(percorsoCompleto: str, contenuto: str) -> bool:
+def scriviSuFile(percorsoCompleto: str, contenuto: str) -> bool:
     try:
         fp = open(percorsoCompleto, 'w')
         fp.write(contenuto)
@@ -78,25 +78,25 @@ def leggiConfig(percorsoCompleto: str) -> str | None:
         return toret
     except PermissionError as e:
         log.error(f"Impossibile aprire il file config - permesso negato - {e}")
-        return None
     except FileNotFoundError:
-        return ''
+        log.debug(f"File configurazione nodo non trovato in {percorsoCompleto}")
+    return None
 
 
-def sovrascriviFile(percorso: str, nomefile: str, contenuto: str) -> bool:
+def aggiornaFile(percorso: str, nomefile: str, contenuto: str, safebin: SafeBin) -> bool:
     percorsoCompleto = percorso + '/' + nomefile
-    if gotoSafeBin(percorsoCompleto=percorsoCompleto, nomefile=nomefile):
-        return __scriviSuFile(percorsoCompleto=percorsoCompleto, contenuto=contenuto)
+    if gotoSafeBin(percorsoCompleto=percorsoCompleto, nomefile=nomefile, safebin=safebin):
+        return scriviSuFile(percorsoCompleto=percorsoCompleto, contenuto=contenuto)
     else:
         return False
 
 
 def eliminaFile(percorso: str, nome: str) -> bool:
-    return gotoSafeBin(percorsoCompleto=percorso, nomefile=nome)
+    pass  # todo
 
 
-def gotoSafeBin(percorsoCompleto: str, nomefile: str) -> bool:
-    return spostaFiles(src=percorsoCompleto + nomefile, dst=SafeBinManager.getDefaultSafeBinPath() + nomefile)
+def gotoSafeBin(percorsoCompleto: str, nomefile: str, safebin: SafeBin = SafeBinManager.getDefaultSafeBinPath()) -> bool:
+    return spostaFiles(src=percorsoCompleto + nomefile, dst=safebin.getPath()+'/'+nomefile)
 
 
 def spostaFiles(src: str, dst: str) -> bool:
@@ -114,7 +114,7 @@ def verificaDir(percorso: str):
     return os.path.isdir(percorso)
 
 
-def sincronizzaFiles() -> list:  # lista di elementi da copiare
+def sincronizzaFiles():  # lista di elementi da copiare
     pass  # todo
 
 
@@ -130,4 +130,4 @@ def copiaFile(src: str, dst: str):
 
 
 def fileScaduto(percorso: str) -> bool:
-    pass
+    pass  # todo

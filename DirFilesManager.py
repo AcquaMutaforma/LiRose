@@ -61,11 +61,23 @@ class File(Elemento):
     def getSize(self) -> int:
         return self.__size
 
+    def __eq__(self, other):
+        if not isinstance(other, File):
+            return False
+        if self.getFilename() != other.getFilename():
+            return False
+        if self.getHashcode() != other.getHashcode():
+            return False
+        return True
+
 
 class Dir(Elemento):
-    def __init__(self, dirname: str):
+    def __init__(self, dirname: str, c: list[Elemento] = None):
         self.__dirname = dirname
-        self.__contenuto: list[Elemento] = []
+        if c is None:  # TODO: Nuovo elemento, prima non c'era, controlla se servono fix in basso
+            self.__contenuto: list[Elemento] = []
+        else:
+            self.__contenuto: list[Elemento] = c
 
     def aggiungiElemento(self, oggetto: Elemento):
         if isinstance(oggetto, Elemento):  # e' corretto, ho controllato
@@ -85,6 +97,17 @@ class Dir(Elemento):
             'dirname': self.getDirname(),
             'contenuto': cont
         }
+
+    def cambiaContenuto(self, c: list[Elemento]):
+        if c is not None:
+            self.__contenuto = c
+
+    def __eq__(self, other):
+        if not isinstance(other, Dir):
+            return False
+        if self.getDirname() != other.getDirname():
+            return False
+        return True
 
 
 def aggiornaConfigFile(dirpath: str) -> bool:

@@ -14,7 +14,7 @@ confFile = '/file_Config.conf'
 
 def leggiConfigFile(dirpath: str) -> list[dict] | None:
     """Una volta letto il file, tramite JSON ritorno una lista di dict"""
-    percorso = dirpath + confFile
+    percorso = dirpath + '/' + confFile
     toret = FileManager.leggiConfig(percorsoCompleto=percorso)
     if toret is not None:
         return json.loads(toret)

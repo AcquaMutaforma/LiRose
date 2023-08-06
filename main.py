@@ -1,14 +1,14 @@
 # Ara ara
-
+import DifferenzeClass
 import FileManager
 from DirectoryManager import Directory
 import NodoClass
 import ConfigManager
-from DifferenzeClass import Diff
+from DifferenzeClass import Differenza
 
 FileManager.verificaComponentiAvvio()
 
-# oggetti principali
+""" oggetti principali """
 nodoLocale = NodoClass.getNodoFromConfig(ConfigManager.leggiConfigNodo())
 
 # TODO: se nodo locale non "esiste" va creato, se in qualsiasi momento qualquadra non cosa il programma si DEVE bloccare
@@ -35,7 +35,7 @@ def rimuoviDirDalNodo() -> bool:
     pass  # todo
 
 
-def ricercaUpdateDirSingola(dirobj: Directory) -> Diff:
+def ricercaUpdateDirSingola(dirobj: Directory) -> Differenza:
     # effettua la ricerca tramite connection manager, recupera la config, genera gli oggetti e valuta il risultato
     # Se TRUE -> APPLICA MODIFICHE
     pass  # todo
@@ -45,7 +45,7 @@ def ricercaUpdateNodo() -> bool:
     pass  # Ricorsivamente chiama ricercaUpdateDirSingola su ogni DIR del nodo
 
 
-def applicaUpdateCompleto(diff: Diff) -> bool:
+def applicaUpdateCompleto(diff: Differenza) -> bool:
     pass  # todo
 
 
@@ -96,3 +96,12 @@ def rimuoviNodoAmico(nodo: NodoClass.NodoAmico) -> bool:
 
 def modificaPercorsoSafeBin(path: str) -> bool:
     return nodoLocale.modificaSafeBinPath(path)
+
+
+def modificaGiorniScadenza():
+    pass  # todo
+
+
+def modificaGrandezzaFileMassima():
+    pass  # todo
+

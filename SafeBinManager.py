@@ -4,9 +4,11 @@ MaxSide = 100 MB a X. Default 10GB
 """
 import FileManager
 
+cartella_safebin = 'safeBin'
+
 
 def getDefaultSafeBinPath() -> str:
-    return str(__file__).replace('SafeBinManager.py', FileManager.cartella_safebin)
+    return str(__file__).replace('SafeBinManager.py', cartella_safebin)
 
 
 class SafeBin:
@@ -17,14 +19,23 @@ class SafeBin:
         """
         self.__percorso = path
         self.__giorniScadenza = maxday
-        self.__grandezzaMassima = maxsize
+        self.__grandezzaMax = maxsize
         self.verificaFiles()
+
+    def getPath(self):
+        return self.__percorso
+
+    def getGiorniScadenza(self):
+        return self.__giorniScadenza
+
+    def getGrandezzaMax(self):
+        return self.__grandezzaMax
 
     def toDict(self):
         return {
-            'percorso': self.__percorso,
-            'giorniScadenza': self.__giorniScadenza,
-            'grandezzaMax': self.__grandezzaMassima
+            'percorso': self.getPath(),
+            'giorniScadenza': self.getGiorniScadenza(),
+            'grandezzaMax': self.getGrandezzaMax()
         }
 
     # todo: metodo per verifica e applicazione di cancellazioni, etc etc
@@ -45,9 +56,12 @@ class SafeBin:
 
     def modificaGrandezzaMax(self, maxbyte: int) -> bool:
         if maxbyte > 1e+7:
-            self.__grandezzaMassima = maxbyte
+            self.__grandezzaMax = maxbyte
             return True
         return False
+
+    def verificaScandenzaFiles(self):
+        pass  # todo
 
 
 def getSafeBinFromConfig(sbpath: dict) -> SafeBin | None:
@@ -55,14 +69,6 @@ def getSafeBinFromConfig(sbpath: dict) -> SafeBin | None:
     gg = sbpath.get('giorniScadenza')
     maxbyte = sbpath.get('grandezzaMax')
     if path is None or gg is None or maxbyte is None:
-        return None
+        return SafeBin()
     return SafeBin(path=path, maxday=gg, maxsize=maxbyte)
 
-
-def verificaScandenzaFile():
-    pass  # todo
-
-
-
-# Qua devo inserire anche i metodi per verificare le date, fare controlli, gestire il file
-# config che contiene le scadenze dei vari files etc.. etc..

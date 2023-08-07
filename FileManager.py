@@ -95,7 +95,8 @@ def eliminaFile(percorso: str, nome: str) -> bool:
     pass  # todo
 
 
-def gotoSafeBin(percorsoCompleto: str, nomefile: str, safebin: SafeBin = SafeBinManager.getDefaultSafeBinPath()) -> bool:
+def gotoSafeBin(percorsoCompleto: str, nomefile: str, safebin: SafeBin) -> bool:
+    # todo: safe bin deve aggiungere il "record" dell'oggetto nella config safe
     return spostaFiles(src=percorsoCompleto + nomefile, dst=safebin.getPath()+'/'+nomefile)
 
 
@@ -129,5 +130,3 @@ def copiaFile(src: str, dst: str):
     pass
 
 
-def fileScaduto(percorso: str) -> bool:
-    pass  # todo

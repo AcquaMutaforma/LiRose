@@ -135,3 +135,6 @@ def listaBackupElemToDict(lista: list[BackupElem]) -> list[dict]:
     for x in lista:
         toret.append(x.toDict())
     return toret
+
+
+globalSafeBin = getSafeBinFromConfig()

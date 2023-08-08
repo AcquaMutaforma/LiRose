@@ -1,10 +1,10 @@
 # Ara ara
-import DifferenzeClass
+import DifferenzeManager
 import FileManager
 from DirectoryManager import Directory
 import NodoClass
 import ConfigManager
-from DifferenzeClass import Differenza
+from DifferenzeManager import Differenza
 
 FileManager.verificaComponentiAvvio()
 

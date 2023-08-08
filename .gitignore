@@ -8,3 +8,7 @@ appunti.txt
 /tests/tmp
 /tests/Logs
 *.conf
+
+*.vpp
+
+*.vpp*

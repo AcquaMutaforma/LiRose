@@ -98,10 +98,6 @@ class Dir(Elemento):
             'contenuto': cont
         }
 
-    def cambiaContenuto(self, c: list[Elemento]):
-        if c is not None:
-            self.__contenuto = c
-
     def __eq__(self, other):
         if not isinstance(other, Dir):
             return False

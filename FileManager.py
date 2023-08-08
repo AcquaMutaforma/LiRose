@@ -22,6 +22,7 @@ def verificaComponentiAvvio(safebinObj: SafeBin):
                 exit(0)
 
 
+# TODO: credo non serva a nessuno
 def creaFile(percorso: str, nomefile: str, contenuto: str) -> bool:
     percorsoCompleto = percorso + '/' + nomefile
     try:
@@ -39,7 +40,7 @@ def creaCartella(percorso: str, nomedir: str) -> bool:
     except PermissionError as e:
         log.error(f"Creazione cartella [{percorso+nomedir}] Fallita - {e}")
     except FileExistsError as e:
-        log.error(f"Creazione cartella [{percorso+nomedir}] Fallita - {e}")
+        log.warning(f"Creazione cartella [{percorso+nomedir}] Fallita - {e}")
     return False
 
 
@@ -79,7 +80,7 @@ def leggiConfig(percorsoCompleto: str) -> str | None:
     except PermissionError as e:
         log.error(f"Impossibile aprire il file config - permesso negato - {e}")
     except FileNotFoundError:
-        log.debug(f"File configurazione nodo non trovato in {percorsoCompleto}")
+        log.debug(f"File configurazione non trovato in {percorsoCompleto}")
     return None
 
 
@@ -92,7 +93,7 @@ def aggiornaFile(percorso: str, nomefile: str, contenuto: str, safebin: SafeBin)
 
 
 def eliminaFile(percorso: str, nome: str) -> bool:
-    pass  # todo
+    pass  # todo z_z
 
 
 def gotoSafeBin(percorsoCompleto: str, nomefile: str, safebin: SafeBin) -> bool:
@@ -128,5 +129,3 @@ def copiaFile(src: str, dst: str):
         shutils.copy2(os.path.join(path,x), dst_dir)
     '''
     pass
-
-

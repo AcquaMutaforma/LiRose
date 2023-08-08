@@ -23,7 +23,10 @@ class Differenza:
     def __init__(self, dirpath: str, fonteEsterna: str, diff: Diff = Diff()):
         self.dirLocale = dirpath
         self.fonteEsterna: str = fonteEsterna  # Path o Nome nodo
-        self.diff = diff
+        if diff is None:
+            self.diff = Diff()
+        else:
+            self.diff = diff
 
     def getAggiunti(self) -> list[Elemento]:
         return self.diff.aggiunti
@@ -33,13 +36,6 @@ class Differenza:
 
     def getDifferenti(self) -> list[Elemento]:
         return self.diff.differenti
-
-
-def creaDiff(dirpath: str, fonteEsterna: str, diff: Diff = None) -> Differenza:
-    if diff is None:
-        return Differenza(dirpath=dirpath, fonteEsterna=fonteEsterna)
-    else:
-        return Differenza(dirpath=dirpath, fonteEsterna=fonteEsterna, diff=diff)
 
 
 def confrontaConfigEsterna(dirpath: str, fonteEsterna: str, confEsterna: list[dict]) -> Differenza | None:
@@ -68,7 +64,7 @@ def confrontaConfigEsterna(dirpath: str, fonteEsterna: str, confEsterna: list[di
     for y in listaEsterna:
         if isinstance(y, Dir):
             diff.aggiunti.append(y)
-    return creaDiff(dirpath=dirpath, fonteEsterna=fonteEsterna, diff=diff)
+    return Differenza(dirpath=dirpath, fonteEsterna=fonteEsterna, diff=diff)
 
 
 def confrontoFiles(loc: list[Elemento], est: list[Elemento]) -> Diff:

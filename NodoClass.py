@@ -2,7 +2,6 @@
 Classe Nodo mantiene tutte le info principali del dispositivo
 """
 import DirectoryManager
-import SafeBinManager
 from DirectoryManager import Directory
 import LogManager
 import ConfigManager
@@ -27,12 +26,17 @@ class NodoAmico:
 
 
 class Nodo:
-    def __init__(self, nome: str, sbpath: dict = None, dirlist: list[dict] = None, nodi: list[dict] = None):
+    def __init__(self, nome: str, dirlist: list[dict] = None, nodi: list[dict] = None):
         self.__nickname = nome
-        self.__safeBinPath = SafeBinManager.getSafeBinFromConfig(sbpath)
-        self.__directoryList: list[Directory] = DirectoryManager.loadDirsFromConfig(dirlist)  # lista dalla config
+        if dirlist is None:
+            self.__directoryList = []
+        else:
+            self.__directoryList: list[Directory] = DirectoryManager.loadDirsFromConfig(dirlist)  # lista dalla config
         # NOTA: La view deve inserire i dati di ogni DIR e chiamare una "verificaEsistenza"
-        self.__nodiAmici: list[NodoAmico] = creaListaNodoAmicoFromConfig(nodi)
+        if nodi is None:
+            self.__nodiAmici = []
+        else:
+            self.__nodiAmici: list[NodoAmico] = creaListaNodoAmicoFromConfig(nodi)
         log.debug(f"Creato Nodo = {self.toDict()}")
 
     def toDict(self) -> dict:
@@ -45,7 +49,6 @@ class Nodo:
             nodiAmichevoli.append(y.toDict())
         return {
             'nickname': self.__nickname,
-            'safeBinPath': self.__safeBinPath.toDict(),
             'directoryList': dirList,  # lista con obj directory va trasformata in lista come "dirList" con solo i path
             'nodiAmici': nodiAmichevoli
         }
@@ -86,8 +89,14 @@ class Nodo:
     def getListaDir(self):
         return self.__directoryList
 
-    def modificaSafeBinPath(self, newPercorso: str) -> bool:
-        return self.__safeBinPath.modificaPercorso(newPercorso)
+    def cambiaNickname(self, nome: str):
+        if len(nome) > 4:
+            self.__nickname = nome
+            return True
+        return False
+
+    def getNickname(self) -> str:
+        return self.__nickname
 
 
 def creaListaNodoAmicoFromConfig(lista: list[dict]) -> list[NodoAmico]:
@@ -101,14 +110,14 @@ def creaListaNodoAmicoFromConfig(lista: list[dict]) -> list[NodoAmico]:
     return toret
 
 
-def getNodoFromConfig(config: dict) -> Nodo | None:
+def getNodoFromConfig() -> Nodo:
+    config = ConfigManager.leggiConfigNodo()
     if config is None:
-        return None
+        return Nodo(nome='default')
     nick = config.get('nickname')
-    safeBin = config.get('safeBinPath')
     dirlist = config.get('directoryList')
     nodiAmici = config.get('nodiAmici')
-    if nick is None or safeBin is None or dirlist is None or nodiAmici is None:
-        return None
+    if nick is None or dirlist is None or nodiAmici is None:
+        return Nodo(nome='default')
     else:
-        return Nodo(nome=nick, sbpath=safeBin, dirlist=dirlist, nodi=nodiAmici)
+        return Nodo(nome=nick, dirlist=dirlist, nodi=nodiAmici)

@@ -40,7 +40,7 @@ class Differenza:
 
 def confrontaConfigEsterna(dirpath: str, fonteEsterna: str, confEsterna: list[dict]) -> Differenza | None:
     # Ci si aspetta che la cartella in questione ESISTA, qua non controlla nulla, al massimo un try-except
-    if dirpath is None or fonteEsterna is None:
+    if dirpath is None or fonteEsterna is None or confEsterna is None:
         return None
     diff = Diff()
     # Non ricalcolo tutto, prendo la CONFIG dei file dato viene ri-generata all'avvio del software

@@ -62,21 +62,21 @@ class SafeBin:
     def modificaPercorso(self, path: str) -> bool:
         if FileManager.verificaDir(path):
             self.__percorso = path
-            ConfigManager.aggiornaConfigSafeBin(path=path, contenuto=self.toDict())
+            ConfigManager.aggiornaConfigSafeBin(contenuto=self.toDict())
             return True
         return False
 
     def modificaGiorniScadenza(self, gg: int) -> bool:
         if 7 <= gg <= 60:
             self.__giorniScadenza = gg
-            ConfigManager.aggiornaConfigSafeBin(path=self.getPath(), contenuto=self.toDict())
+            ConfigManager.aggiornaConfigSafeBin(contenuto=self.toDict())
             return True
         return False
 
     def modificaGrandezzaMax(self, maxbyte: int) -> bool:
         if maxbyte > 1e+7:
             self.__grandezzaMax = maxbyte
-            ConfigManager.aggiornaConfigSafeBin(path=self.getPath(), contenuto=self.toDict())
+            ConfigManager.aggiornaConfigSafeBin(contenuto=self.toDict())
             return True
         return False
 
@@ -99,20 +99,15 @@ class SafeBin:
         ConfigManager.aggiornaSafeBinList(path=self.getPath(), contenuto=toret)
 
 
-def getSafeBinFromConfig(path: str = None) -> SafeBin | None:
-    if path is None:
-        p = getDefaultSafeBinPath()
-    else:
-        p = path
-    sb = ConfigManager.leggiConfigSafeBin(p)
-    if sb is None:
-        return SafeBin()
+def getSafeBinFromConfig() -> SafeBin:
+    sb = ConfigManager.leggiConfigSafeBin()
     path = sb.get('percorso')
     gg = sb.get('giorniScadenza')
     maxbyte = sb.get('grandezzaMax')
     if path is None or gg is None or maxbyte is None:
         return SafeBin()
-    return SafeBin(path=path, maxday=gg, maxsize=maxbyte)
+    else:
+        return SafeBin(path=path, maxday=gg, maxsize=maxbyte)
 
 
 def creaListaBackupElemFromConfig(sb: SafeBin) -> list[BackupElem]:
@@ -135,6 +130,3 @@ def listaBackupElemToDict(lista: list[BackupElem]) -> list[dict]:
     for x in lista:
         toret.append(x.toDict())
     return toret
-
-
-globalSafeBin = getSafeBinFromConfig()

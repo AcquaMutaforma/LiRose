@@ -32,3 +32,5 @@ def IPToString(indirizzo: socket.socket) -> str:
 
 
 # TODO : Questo utilizza {Autenticator.py} per verificare i nodi prima di parlarci !!!
+
+# todo: la componente server deve utilizzare smistamento per applicare gli aggiornamenti avviati da esterno

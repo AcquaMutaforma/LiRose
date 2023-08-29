@@ -48,12 +48,6 @@ class Ridondanza(Directory):
     def diventaDir(self):
         return Directory(self.getNome(), self.getPath())
 
-    def checkSincronizzazione(self) -> bool:
-        # todo
-        """Penso dovrebbe usare il metodo presente in DirFilesManager che utilizza i file config per fare le differenze
-        e valutare l'aggiornamento"""
-        pass
-
 
 def creaDir(nome: str, path: str) -> Directory | None:
     if nome is None or path is None:

@@ -12,13 +12,16 @@ cartella_keys = 'keys'
 
 def verificaComponentiAvvio(safebinObj: SafeBin):
     percorsoBase = str(__file__).removesuffix('FileManager.py')
-    cartelle = [cartella_configFiles, cartella_keys, LogManager.cartella_logs,
-                SafeBinManager.getDefaultSafeBinPath(), safebinObj.getPath()]
+    cartelle = [percorsoBase + cartella_configFiles,
+                percorsoBase + cartella_keys,
+                percorsoBase + LogManager.cartella_logs,
+                percorsoBase + SafeBinManager.cartella_safebin,
+                safebinObj.getPath()]
     for x in cartelle:
-        if not verificaDir(percorsoBase+x):
-            happy = creaCartella(percorsoBase, x)
+        if not verificaDir(x):
+            happy = creaCartella(x)
             if not happy:
-                log.critical(f"Permessi negati per la creazione di cartella [{x}] in [{percorsoBase}] - EXIT Q_Q")
+                log.critical(f"Permessi negati per la creazione di cartella [{x}] - EXIT Q_Q")
                 exit(0)
 
 
@@ -33,14 +36,14 @@ def creaFile(percorso: str, nomefile: str, contenuto: str) -> bool:
         return scriviSuFile(percorsoCompleto=percorso, contenuto=contenuto)
 
 
-def creaCartella(percorso: str, nomedir: str) -> bool:
+def creaCartella(percorso: str) -> bool:
     try:
-        os.mkdir(path=percorso+nomedir)
+        os.mkdir(path=percorso)
         return True
     except PermissionError as e:
-        log.error(f"Creazione cartella [{percorso+nomedir}] Fallita - {e}")
+        log.error(f"Creazione cartella [{percorso}] Fallita - {e}")
     except FileExistsError as e:
-        log.warning(f"Creazione cartella [{percorso+nomedir}] Fallita - {e}")
+        log.warning(f"Creazione cartella [{percorso}] Fallita - {e}")
     return False
 
 

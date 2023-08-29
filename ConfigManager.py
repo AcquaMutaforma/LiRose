@@ -5,39 +5,39 @@ import FileManager
 log = LogManager.setName(__name__)
 
 cartella = str(__file__).replace('ConfigManager.py', 'configFiles')
-confNodo = '/nodo_Config.conf'
+confNodo = cartella + '/nodo_Config.conf'
 confDir = '/dir_Config.conf'
 confFile = '/file_Config.conf'
-confSafe = '/safe.conf'
+confSafe = cartella + '/safe.conf'
 safebinlist = '/sblist.conf'
 # NOTAA: il file configurazione viene usato per fare il confronto con altri nodi, non gli frega se in locale hai
 # fatto delle modifiche o meno
 
 
-def leggiConfigFile(dirpath: str) -> list[dict] | None:
+def leggiConfigFile(dirpath: str) -> list[dict]:
     """Una volta letto il file, tramite JSON ritorno una lista di dict"""
     percorso = dirpath + '/' + confFile
     toret = FileManager.leggiConfig(percorsoCompleto=percorso)
     if toret is not None:
         return json.loads(toret)
     else:
-        return None
+        return []
 
 
-def leggiConfigDirs() -> list[dict] | None:
+def leggiConfigDirs() -> list[dict]:
     """Una volta letto il file, tramite JSON ritorno una lista di dict"""
     toret = FileManager.leggiConfig(percorsoCompleto=confDir)
     if toret is not None:
         return json.loads(toret)
-    return None
+    return []
 
 
-def leggiConfigNodo() -> dict | None:
+def leggiConfigNodo() -> dict:
     """Una volta letto il file, tramite JSON ritorno una lista di dict"""
     toret = FileManager.leggiConfig(percorsoCompleto=confNodo)
     if toret is not None:
         return json.loads(toret)
-    return None
+    return {}
 
 
 def aggiornaConfigFile(dirpath: str, contenuto: list[dict]) -> bool:
@@ -56,13 +56,13 @@ def aggiornaConfigNodo(contenuto: dict) -> bool:
     return FileManager.scriviConfig(percorsoCompleto=confNodo, contenuto=cont)
 
 
-def leggiSafeBinList(path: str) -> list[dict] | None:
+def leggiSafeBinList(path: str) -> list[dict]:
     percorso = path + safebinlist
     toret = FileManager.leggiConfig(percorsoCompleto=percorso)
     if toret is not None:
         return json.loads(toret)
     else:
-        return None
+        return []
 
 
 def aggiornaSafeBinList(path: str, contenuto: list[dict]) -> bool:
@@ -71,13 +71,16 @@ def aggiornaSafeBinList(path: str, contenuto: list[dict]) -> bool:
     return FileManager.scriviConfig(percorsoCompleto=percorso, contenuto=cont)
 
 
-def leggiConfigSafeBin(path: str) -> dict | None:
+def leggiConfigSafeBin() -> dict:
     """Una volta letto il file, tramite JSON ritorno una lista di dict"""
-    toret = FileManager.leggiConfig(percorsoCompleto=path + confSafe)
-    return json.loads(toret)
+    toret = FileManager.leggiConfig(percorsoCompleto=confSafe)
+    if toret is not None:
+        return json.loads(toret)
+    else:
+        return {}
 
 
-def aggiornaConfigSafeBin(path: str, contenuto: dict) -> bool:
+def aggiornaConfigSafeBin(contenuto: dict) -> bool:
     cont = json.dumps(obj=contenuto)
-    return FileManager.scriviConfig(percorsoCompleto=path + confSafe, contenuto=cont)
+    return FileManager.scriviConfig(percorsoCompleto=confSafe, contenuto=cont)
 

@@ -2,7 +2,7 @@
 Classe Nodo mantiene tutte le info principali del dispositivo
 """
 import DirectoryManager
-from DirectoryManager import Directory
+from DirectoryManager import Directory, Ridondanza
 import LogManager
 import ConfigManager
 
@@ -30,8 +30,9 @@ class Nodo:
         self.__nickname = nome
         if dirlist is None:
             self.__directoryList = []
+            self.__ridondanze = []
         else:
-            self.__directoryList: list[Directory] = DirectoryManager.loadDirsFromConfig(dirlist)  # lista dalla config
+            self.__directoryList, self.__ridondanze = DirectoryManager.loadDirsFromConfig(dirlist)  # lista dalla config
         # NOTA: La view deve inserire i dati di ogni DIR e chiamare una "verificaEsistenza"
         if nodi is None:
             self.__nodiAmici = []
@@ -61,6 +62,12 @@ class Nodo:
             log.warning(f"Aggiunta di nuova DIR nella lista nodo fallita, Dir = None")
         return False
 
+    def creaRidondanza(self, dir: Directory) -> bool:
+        pass  # todo
+
+    def rimuoviRidondanza(self, rid: Ridondanza) -> bool:
+        pass  # todo
+
     def rimuoviDirectory(self, dirobj: Directory) -> bool:
         self.__directoryList.remove(dirobj)
         if self.__directoryList.count(dirobj):
@@ -89,9 +96,13 @@ class Nodo:
     def getListaDir(self):
         return self.__directoryList
 
+    def getListaRidondanze(self):
+        return self.__ridondanze
+
     def cambiaNickname(self, nome: str):
         if len(nome) > 4:
             self.__nickname = nome
+            ConfigManager.aggiornaConfigNodo(self.toDict())
             return True
         return False
 
@@ -121,3 +132,6 @@ def getNodoFromConfig() -> Nodo:
         return Nodo(nome='default')
     else:
         return Nodo(nome=nick, dirlist=dirlist, nodi=nodiAmici)
+
+
+GlobalNodoLocale: Nodo

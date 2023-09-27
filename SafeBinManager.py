@@ -2,21 +2,14 @@
 giorni scadenza = da 7 a 60. Default 20g
 MaxSide = 100 MB a X. Default 10GB
 """
-import FileManager
 import ConfigManager
 import datetime
 
 dateFormat = "%d/%m/%Y %H:%M:%S"
 
-cartella_safebin = 'safeBin'
-
-
-def getDefaultSafeBinPath() -> str:
-    return str(__file__).replace('SafeBinManager.py', cartella_safebin)
-
 
 class BackupElem:
-    def __init__(self, filename:str, oldpath: str, data: str = None):
+    def __init__(self, filename: str, oldpath: str, data: str = None):
         self.filename = filename
         self.oldpath = oldpath
         if data is None:
@@ -33,12 +26,15 @@ class BackupElem:
 
 
 class SafeBin:
-    def __init__(self, path: str = getDefaultSafeBinPath(), maxday: int = 20, maxsize: int = 1e+9):
+    def __init__(self, path: str, maxday: int = 20, maxsize: int = 1e+9):
+        if path is None or len(path) < 4:
+            self.__percorso = str(__file__).replace('SafeBinManager.py', ConfigManager.confSafe)
+        else:
+            self.__percorso = path
         """
         :param maxday: numero di giorni da aspettare prima di cancellare i files nella SafeBin. Default 20g
         :param maxsize: Grandezza massima in Byte per la rimozione anticipata. Default 10GB
         """
-        self.__percorso = path
         self.__giorniScadenza = maxday
         self.__grandezzaMax = maxsize
         self.verificaScadenzeSafeBin()
@@ -60,11 +56,8 @@ class SafeBin:
         }
 
     def modificaPercorso(self, path: str) -> bool:
-        if FileManager.verificaDir(path):
-            self.__percorso = path
-            ConfigManager.aggiornaConfigSafeBin(contenuto=self.toDict())
-            return True
-        return False
+        self.__percorso = path
+        return ConfigManager.aggiornaConfigSafeBin(contenuto=self.toDict())
 
     def modificaGiorniScadenza(self, gg: int) -> bool:
         if 7 <= gg <= 60:
@@ -80,20 +73,23 @@ class SafeBin:
             return True
         return False
 
-    def verificaScadenzeSafeBin(self):
+    def verificaScadenzeSafeBin(self) -> list:
         """Viene chiamato alla creazione, non serve avviarlo nuovamente."""
-        elementi = creaListaBackupElemFromConfig(self)
+        elementi = creaListaBackupElemFromConfig()
         oggi = datetime.datetime.today()
+        toremove = []
         for x in elementi:
             dataIns = datetime.datetime.strptime(x.dataInserimento, dateFormat)
+            # se il file e' nella "safe bin" da piu giorni di quelli consentiti, procedo alla rimozione
             if (dataIns + datetime.timedelta(days=self.getGiorniScadenza())) > oggi:
-                FileManager.eliminaFile(percorso=self.getPath(), nome=x.filename)
-                elementi.remove(x)
+                toremove.append(x.filename)
+                # FileManager.eliminaFile(percorso=self.getPath(), nome=x.filename)
         ConfigManager.aggiornaSafeBinList(path=self.getPath(), contenuto=listaBackupElemToDict(elementi))
+        return toremove
 
     def aggiungiFile(self, fn: str, oldp: str):
         new = BackupElem(filename=fn, oldpath=oldp)
-        elem = creaListaBackupElemFromConfig(self)
+        elem = creaListaBackupElemFromConfig()
         elem.append(new)
         toret = listaBackupElemToDict(elem)
         ConfigManager.aggiornaSafeBinList(path=self.getPath(), contenuto=toret)
@@ -110,9 +106,12 @@ def getSafeBinFromConfig() -> SafeBin:
         return SafeBin(path=path, maxday=gg, maxsize=maxbyte)
 
 
-def creaListaBackupElemFromConfig(sb: SafeBin) -> list[BackupElem]:
+GlobalSafeBin = SafeBin
+
+
+def creaListaBackupElemFromConfig() -> list[BackupElem]:
     toret: list[BackupElem] = []
-    path = sb.getPath()
+    path = GlobalSafeBin.getPath()
     configSB = ConfigManager.leggiSafeBinList(path)
     for x in configSB:
         fn = x.get('filename')
@@ -130,3 +129,4 @@ def listaBackupElemToDict(lista: list[BackupElem]) -> list[dict]:
     for x in lista:
         toret.append(x.toDict())
     return toret
+

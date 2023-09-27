@@ -1,40 +1,65 @@
 import LogManager
 import json
-import FileManager
+import subprocess  # per creare files invisibili in windows :<
+import os
 
 log = LogManager.setName(__name__)
 
-cartella = str(__file__).replace('ConfigManager.py', 'configFiles')
-confNodo = cartella + '/nodo_Config.conf'
-confDir = '/dir_Config.conf'
-confFile = '/file_Config.conf'
-confSafe = cartella + '/safe.conf'
+cartellaConfig = str(__file__).replace('ConfigManager.py', 'configFiles')
+confNodo = cartellaConfig + '/nodo.conf'
+confFile = '/files.conf'
+confSafe = '/safe.conf'
 safebinlist = '/sblist.conf'
-# NOTAA: il file configurazione viene usato per fare il confronto con altri nodi, non gli frega se in locale hai
+# NOTAA: i files configurazione viene usato per fare il confronto con altri nodi, non gli frega se in locale hai
 # fatto delle modifiche o meno
+
+
+cartella_configFiles = 'configFiles'
+# cartella_keys = 'keys'
+
+
+def creaCartella(percorso: str) -> bool:
+    try:
+        os.mkdir(path=percorso)
+        return True
+    except PermissionError as e:
+        log.error(f"Creazione cartella [{percorso}] Fallita - {e}")
+    except FileExistsError as e:
+        log.warning(f"Creazione cartella [{percorso}] Fallita - {e}")
+    return False
+
+
+def verificaComponentiAvvio():
+    percorsoBase = str(__file__).removesuffix('FileManager.py')
+    cartelle = [
+        percorsoBase + cartella_configFiles,
+        #percorsoBase + cartella_keys,
+        percorsoBase + LogManager.cartella_logs,
+        #percorsoBase + SafeBinManager.cartella_safebin,
+        #safebinObj.getPath()
+    ]
+    for x in cartelle:
+        if not os.path.isdir(x):
+            # se non esiste provo a crearla, se non ci riesce allora c'e' un problema :((
+            happy = creaCartella(x)
+            if not happy:
+                log.critical(f"Permessi negati per la creazione di cartella [{x}] - EXIT Q_Q")
+                exit(0)
 
 
 def leggiConfigFile(dirpath: str) -> list[dict]:
     """Una volta letto il file, tramite JSON ritorno una lista di dict"""
     percorso = dirpath + '/' + confFile
-    toret = FileManager.leggiConfig(percorsoCompleto=percorso)
+    toret = leggiConfig(percorsoCompleto=percorso)
     if toret is not None:
         return json.loads(toret)
     else:
         return []
 
 
-def leggiConfigDirs() -> list[dict]:
-    """Una volta letto il file, tramite JSON ritorno una lista di dict"""
-    toret = FileManager.leggiConfig(percorsoCompleto=confDir)
-    if toret is not None:
-        return json.loads(toret)
-    return []
-
-
 def leggiConfigNodo() -> dict:
     """Una volta letto il file, tramite JSON ritorno una lista di dict"""
-    toret = FileManager.leggiConfig(percorsoCompleto=confNodo)
+    toret = leggiConfig(percorsoCompleto=confNodo)
     if toret is not None:
         return json.loads(toret)
     return {}
@@ -43,22 +68,17 @@ def leggiConfigNodo() -> dict:
 def aggiornaConfigFile(dirpath: str, contenuto: list[dict]) -> bool:
     percorso = dirpath + "/" + confFile
     cont = json.dumps(obj=contenuto)
-    return FileManager.scriviConfig(percorsoCompleto=percorso, contenuto=cont, hidden=True)
-
-
-def aggiornaConfigDir(contenuto: list[dict]) -> bool:
-    cont = json.dumps(obj=contenuto)
-    return FileManager.scriviConfig(percorsoCompleto=confDir, contenuto=cont)
+    return scriviConfig(percorsoCompleto=percorso, contenuto=cont, hidden=True)
 
 
 def aggiornaConfigNodo(contenuto: dict) -> bool:
     cont = json.dumps(obj=contenuto)
-    return FileManager.scriviConfig(percorsoCompleto=confNodo, contenuto=cont)
+    return scriviConfig(percorsoCompleto=confNodo, contenuto=cont)
 
 
 def leggiSafeBinList(path: str) -> list[dict]:
     percorso = path + safebinlist
-    toret = FileManager.leggiConfig(percorsoCompleto=percorso)
+    toret = leggiConfig(percorsoCompleto=percorso)
     if toret is not None:
         return json.loads(toret)
     else:
@@ -68,12 +88,12 @@ def leggiSafeBinList(path: str) -> list[dict]:
 def aggiornaSafeBinList(path: str, contenuto: list[dict]) -> bool:
     cont = json.dumps(obj=contenuto)
     percorso = path + safebinlist
-    return FileManager.scriviConfig(percorsoCompleto=percorso, contenuto=cont)
+    return scriviConfig(percorsoCompleto=percorso, contenuto=cont)
 
 
 def leggiConfigSafeBin() -> dict:
     """Una volta letto il file, tramite JSON ritorno una lista di dict"""
-    toret = FileManager.leggiConfig(percorsoCompleto=confSafe)
+    toret = leggiConfig(percorsoCompleto=confSafe)
     if toret is not None:
         return json.loads(toret)
     else:
@@ -82,5 +102,36 @@ def leggiConfigSafeBin() -> dict:
 
 def aggiornaConfigSafeBin(contenuto: dict) -> bool:
     cont = json.dumps(obj=contenuto)
-    return FileManager.scriviConfig(percorsoCompleto=confSafe, contenuto=cont)
+    # todo: se il percorso è diverso, va cancellata la vecchia config ?
+    return scriviConfig(percorsoCompleto=contenuto.get('percorso') + confSafe, contenuto=cont)
+
+
+def scriviConfig(percorsoCompleto: str, contenuto: str, hidden: bool = False) -> bool:
+    try:
+        fp = open(percorsoCompleto, 'w')
+        fp.write(contenuto)
+        fp.close()
+        if hidden and os.name == 'nt':
+            try:
+                subprocess.check_call(["attrib", "+H", percorsoCompleto])
+            except Exception as e:
+                log.warning(f"Occultamento file config {percorsoCompleto} fallito - {e}")
+        return True
+    except PermissionError as e:
+        log.error(f"Errore scrittura file [{percorsoCompleto}] - {e}")
+        return False
+
+
+def leggiConfig(percorsoCompleto: str) -> str | None:
+    try:
+        f = open(percorsoCompleto, 'r')
+        toret = f.read()
+        f.close()
+        return toret
+    except PermissionError as e:
+        log.error(f"Impossibile aprire il file config - permesso negato - {e}")
+    except FileNotFoundError:
+        log.debug(f"File configurazione non trovato in {percorsoCompleto}")
+    return None
+
 

@@ -57,7 +57,7 @@ def creaDir(nome: str, path: str) -> Directory | None:
     return tmp
 
 
-def creaRidondanza(nome: str, path: str, parent: str) -> Directory | None:
+def creaRidondanza(nome: str, path: str, parent: str) -> Ridondanza | None:
     if nome is None or path is None or parent is None:
         return None
     tmp = Ridondanza(nome=nome, path=path, parentPath=parent)
@@ -72,11 +72,12 @@ def listaDirsToDict(listadir: list[Directory]) -> list[dict]:
     return toret
 
 
-def loadDirsFromConfig(listaDir: list[dict]) -> list[Directory]:
+def loadDirsFromConfig(listaDir: list[dict]) -> (list[Directory], list[Ridondanza]):
     """Metodo che crea una lista di oggetti Dir attraverso i dati della configurazione"""
     if len(listaDir) < 1:
         return []
-    toRet: list[Directory] = []
+    dirs: list[Directory] = []
+    rids: list[Ridondanza] = []
     for x in listaDir:
         if x is None:
             continue
@@ -84,15 +85,17 @@ def loadDirsFromConfig(listaDir: list[dict]) -> list[Directory]:
             tmp = creaDir(nome=x.get('nome'), path=x.get('path'))
             if tmp is None:
                 continue
+            dirs.append(tmp)
             '''if verificaEsistenzaDir(tmp.getNome(), tmp.getPath()):
                 toRet.append(tmp)'''
         else:
             tmp = creaRidondanza(nome=x.get('nome'), path=x.get('path'), parent=x.get('parent'))
             if tmp is None:
                 continue
+            rids.append(tmp)
             '''if verificaEsistenzaDir(tmp.getNome(), tmp.getPath()):
                 toRet.append(tmp)'''
-    return toRet
+    return dirs, rids
 
 
 # Da chiamare quando si vanno a visualizzare/caricare le dirs

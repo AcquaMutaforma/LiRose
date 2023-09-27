@@ -1,7 +1,7 @@
-import main
-from NodoClass import Nodo, NodoAmico
+from NodoManager import Nodo, NodoAmico
 from SafeBinManager import SafeBin
 from DifferenzeManager import Differenza
+import Controller
 
 
 def getComando():
@@ -33,14 +33,27 @@ def loopAggiornamento(oggetti):  # todo: definire il tipo di lista o dict
     pass
 
 
+def printDir(x):
+    pass
+
+
+def printNodiAmici():
+    pass
+
+
 def printIndex():
     # La view deve inserire i dati di ogni DIR e chiamare una "verificaEsistenza" per poi inserire il relativo "stato"
     print("\n")
     print("-- info nodo locale --")
-    print("Nickname : " + main.getNomeNodoLocale())
-    print("IP attuale : " + main.getIPAttuale())
-    print("SafeBin : " + main.getPercorsoSafeBin())
+    print("Nickname : " + Controller.getNomeNodoLocale())
+    print("IP attuale : " + Controller.getIPAttuale())
+    print("SafeBin : " + Controller.getPercorsoSafeBin())
     print("---------------------")
+    for x in Controller.getListaDir():
+        printDir(x)
+    for y in Controller.getListRidondanze():
+        printDir(y)
+    printNodiAmici()
 
 
 def printStart():
@@ -64,12 +77,12 @@ def printExit():
 def avviaView():
     printStart()
     printIndex()
-    while 1:
-        getComando()
+    try:
+        while 1:
+            getComando()
+    except KeyboardInterrupt:
+        printExit()
 
 
 def printHelp():
     pass
-
-
-avviaView()

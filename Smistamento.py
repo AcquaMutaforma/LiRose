@@ -6,7 +6,6 @@ si occupa di avviare il recupero dalla fonte esterna"""
 import ConnectionManager
 import DifferenzeManager
 from DifferenzeManager import Differenza
-import FileManager
 from DirFilesManager import Elemento, Dir, File
 from DirectoryManager import Directory
 
@@ -33,10 +32,9 @@ def updateAggiungiFile(el: Elemento, sovrascrivi: bool = False):
     """L'aggiornamento consiste in un elemento in Differenza nella lista "aggiunti" quindi vado a recuperare il file
     per aggiungerlo nella dir."""
     if sovrascrivi:
-        FileManager.scriviSuFile()
-    else:
-        FileManager.creaFile()
-    pass
+        return
+        # Nota: Se sovrascrivo la data nuova sarà ">" rispetto al file che viene recuperato, ma l'hash sarà lo stesso
+    return
 
 
 def updateRimuoviFile(el: Elemento):
